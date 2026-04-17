@@ -71,6 +71,7 @@ window.App = {
             setTimeout(() => loader && loader.remove(), 500);
 
             this.populateStateSelect();
+            this.populateCultivoSelect();
             this.updateKPIs();
             this.applyFilters(); // Initial render
 
@@ -93,6 +94,27 @@ window.App = {
             opt.textContent = st;
             stateSel.appendChild(opt);
         });
+    },
+
+    populateCultivoSelect: function() {
+        const cultSel = document.getElementById('cultivoSelect');
+        const cults = [...new Set(this.rawData.map(item => item.cultivo))]
+                        .filter(e => e)
+                        .sort();
+        
+        cults.forEach(cu => {
+            const opt = document.createElement('option');
+            opt.value = cu;
+            opt.textContent = cu;
+            cultSel.appendChild(opt);
+        });
+    },
+
+    onCultivoSelectChange: function() {
+        const val = document.getElementById('cultivoSelect').value;
+        this.filters.cultivo = val === 'all' ? null : val;
+        document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
+        this.applyFilters();
     },
 
     onStateChange: function() {
@@ -142,6 +164,9 @@ window.App = {
             }
         });
 
+        // Reset dropdown if card is chosen
+        document.getElementById('cultivoSelect').value = 'all';
+
         this.applyFilters();
     },
 
@@ -149,6 +174,7 @@ window.App = {
         try {
             document.getElementById('stateSelect').value = 'all';
             document.getElementById('muniSelect').value = 'all';
+            document.getElementById('cultivoSelect').value = 'all';
             
             this.filters.estado = 'all';
             this.filters.municipio = 'all';
@@ -174,11 +200,17 @@ window.App = {
             const matchMuni = this.filters.municipio === 'all' || item.municipio === this.filters.municipio;
             
             let matchCultivo = true;
-            if (this.filters.cultivo !== null) {
+            if (this.filters.cultivo !== null && this.filters.cultivo !== 'all') {
                 const c = (item.cultivo || "").toUpperCase();
                 if (this.filters.cultivo === 'MAIZ') matchCultivo = c.startsWith('MA');
                 else if (this.filters.cultivo === 'CAFE') matchCultivo = c.startsWith('CAF');
-                else matchCultivo = c.includes(this.filters.cultivo);
+                else if (this.filters.cultivo === 'MIEL') matchCultivo = c.startsWith('MIEL');
+                else if (this.filters.cultivo === 'MILPA') matchCultivo = c.startsWith('MILPA');
+                else if (this.filters.cultivo === 'LECHE') matchCultivo = c.startsWith('LECHE');
+                else if (this.filters.cultivo === 'CANA') matchCultivo = c.startsWith('CAÑ') || c.startsWith('CAN');
+                else if (this.filters.cultivo === 'FRIJOL') matchCultivo = c.startsWith('FRIJOL');
+                else if (this.filters.cultivo === 'CACAO') matchCultivo = c.startsWith('CACAO');
+                else matchCultivo = c === this.filters.cultivo.toUpperCase();
             }
 
             return matchState && matchMuni && matchCultivo;
@@ -198,7 +230,7 @@ window.App = {
         // Count for KPI cards statically (base dataset) or dynamic based on other filters?
         // Skill request implies counting for initial view, so base dataset is fine.
         const counts = {
-            'MAIZ': 0, 'CAFE': 0, 'MIEL': 0, 'MILPA': 0, 'LECHE': 0
+            'MAIZ': 0, 'CAFE': 0, 'MIEL': 0, 'MILPA': 0, 'LECHE': 0, 'CANA': 0, 'FRIJOL': 0, 'CACAO': 0
         };
 
         this.rawData.forEach(item => {
@@ -209,6 +241,9 @@ window.App = {
             else if (c.startsWith('MIEL')) counts['MIEL']++;
             else if (c.startsWith('MILPA')) counts['MILPA']++;
             else if (c.startsWith('LECHE')) counts['LECHE']++;
+            else if (c.startsWith('CAÑ') || c.startsWith('CAN')) counts['CANA']++;
+            else if (c.startsWith('FRIJOL')) counts['FRIJOL']++;
+            else if (c.startsWith('CACAO')) counts['CACAO']++;
         });
 
         document.getElementById('kpi-maiz').textContent = counts['MAIZ'].toLocaleString();
@@ -216,6 +251,10 @@ window.App = {
         document.getElementById('kpi-miel').textContent = counts['MIEL'].toLocaleString();
         document.getElementById('kpi-milpa').textContent = counts['MILPA'].toLocaleString();
         document.getElementById('kpi-leche').textContent = counts['LECHE'].toLocaleString();
+        
+        document.getElementById('kpi-cana').textContent = counts['CANA'].toLocaleString();
+        document.getElementById('kpi-frijol').textContent = counts['FRIJOL'].toLocaleString();
+        document.getElementById('kpi-cacao').textContent = counts['CACAO'].toLocaleString();
     },
 
     renderMap: function() {
@@ -230,7 +269,14 @@ window.App = {
             if(c.startsWith('MIEL')) return '#FBBF24';
             if(c.startsWith('MILPA')) return '#10B981';
             if(c.startsWith('LECHE')) return '#3B82F6';
-            return '#64748b'; // Gray
+            if(c.startsWith('CAÑ') || c.startsWith('CAN')) return '#4ADE80';
+            if(c.startsWith('FRIJOL')) return '#78350F';
+            if(c.startsWith('CACAO')) return '#451A03';
+            
+            // Random distinct fallbacks for remaining ones based on string length
+            const hash = cult.length % 5;
+            const extras = ['#8B5CF6', '#EC4899', '#0EA5E9', '#F43F5E', '#14B8A6'];
+            return extras[hash];
         };
 
         this.filteredData.forEach(item => {

@@ -88,6 +88,27 @@
                     <span class="kpi-label">Leche</span>
                 </div>
             </div>
+            <div class="kpi-card glass-panel" data-filter="CANA" onclick="window.App.toggleCardFilter('CANA')">
+                <div class="kpi-icon" style="color: #4ADE80;"><i class="fa-solid fa-seedling"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-cana">0</span>
+                    <span class="kpi-label">Caña</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="FRIJOL" onclick="window.App.toggleCardFilter('FRIJOL')">
+                <div class="kpi-icon" style="color: #78350F;"><i class="fa-solid fa-plate-wheat"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-frijol">0</span>
+                    <span class="kpi-label">Frijol</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="CACAO" onclick="window.App.toggleCardFilter('CACAO')">
+                <div class="kpi-icon" style="color: #451A03;"><i class="fa-brands fa-envira"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-cacao">0</span>
+                    <span class="kpi-label">Cacao</span>
+                </div>
+            </div>
         </section>
 
         <main class="main-content">
@@ -99,6 +120,13 @@
                     <button class="btn-reset" onclick="window.App.resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i> Reset
                     </button>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="cultivoSelect">🌱 Cultivo Extra / Específico</label>
+                    <select id="cultivoSelect" class="form-control" onchange="window.App.onCultivoSelectChange()">
+                        <option value="all">Todos los Cultivos</option>
+                    </select>
                 </div>
                 
                 <div class="filter-group">
