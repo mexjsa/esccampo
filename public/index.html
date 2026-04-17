@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analítica: Escuelas de Campo</title>
+    
+    <!-- SEO Best Practices -->
+    <meta name="description" content="Dashboard Inteligente de Analítica Geográfica para Escuelas de Campo">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <!-- User Hub & Navigation (Premium UI) -->
+        <header class="user-hub glass-panel">
+            <div class="brand">
+                <h1><i class="fa-solid fa-seedling"></i> AgroAnalytics</h1>
+                <span class="subtitle">Escuelas de Campo Nacional</span>
+            </div>
+            
+            <div class="clock-identity">
+                <div class="clock-container">
+                    <span id="realtimeClock" class="clock-time">00:00 AM</span>
+                    <span id="realtimeDate" class="clock-date">Cargando...</span>
+                </div>
+                <div class="user-pill glassmorphism">
+                    <div class="status-indicator online"></div>
+                    <div class="user-info">
+                        <span class="user-name">Operador Principal</span>
+                        <span class="user-role">ID: OP-0001</span>
+                    </div>
+                    <div class="avatar"><i class="fa-solid fa-user-tie"></i></div>
+                </div>
+                <button class="btn-icon grey-scale" onclick="window.print()" title="Imprimir Reporte">
+                    <i class="fa-solid fa-print"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Cards / Interactive Metrics -->
+        <section class="kpi-container">
+            <div class="kpi-card glass-panel" data-filter="MAIZ" onclick="window.App.toggleCardFilter('MAIZ')">
+                <div class="kpi-icon" style="color: #F59E0B;"><i class="fa-solid fa-wheat-awn"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-maiz">0</span>
+                    <span class="kpi-label">Maíz Grano</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="CAFE" onclick="window.App.toggleCardFilter('CAFE')">
+                <div class="kpi-icon" style="color: #6F4E37;"><i class="fa-solid fa-mug-hot"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-cafe">0</span>
+                    <span class="kpi-label">Café</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="MIEL" onclick="window.App.toggleCardFilter('MIEL')">
+                <div class="kpi-icon" style="color: #FBBF24;"><i class="fa-solid fa-jar"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-miel">0</span>
+                    <span class="kpi-label">Miel</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="MILPA" onclick="window.App.toggleCardFilter('MILPA')">
+                <div class="kpi-icon" style="color: #10B981;"><i class="fa-solid fa-leaf"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-milpa">0</span>
+                    <span class="kpi-label">Milpa</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel" data-filter="LECHE" onclick="window.App.toggleCardFilter('LECHE')">
+                <div class="kpi-icon" style="color: #3B82F6;"><i class="fa-solid fa-cow"></i></div>
+                <div class="kpi-data">
+                    <span class="kpi-value" id="kpi-leche">0</span>
+                    <span class="kpi-label">Leche</span>
+                </div>
+            </div>
+        </section>
+
+        <main class="main-content">
+            
+            <!-- Sidebar: Smart Filters -->
+            <aside class="sidebar glass-panel">
+                <div class="sidebar-header">
+                    <h2><i class="fa-solid fa-filter"></i> Filtros</h2>
+                    <button class="btn-reset" onclick="window.App.resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="stateSelect">📍 Estado</label>
+                    <select id="stateSelect" class="form-control" onchange="window.App.onStateChange()">
+                        <option value="all">Todos los Estados</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="muniSelect">🏘️ Municipio</label>
+                    <select id="muniSelect" class="form-control" onchange="window.App.applyFilters()">
+                        <option value="all">Todos los Municipios</option>
+                    </select>
+                </div>
+
+                <div class="filter-group hide-print">
+                    <label>📊 Resumen Activo</label>
+                    <div class="summary-box">
+                        <span class="summary-total" id="summaryTotal">0</span>
+                        <span class="summary-label">Escuelas Visibles</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Map View -->
+            <div class="map-container glass-panel">
+                <!-- Fallback / Loading state -->
+                <div id="mapLoader" class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Cargando Datos...</div>
+                <div id="map"></div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
